@@ -57,39 +57,44 @@ class AccountService:
 
     @staticmethod
     def deposit_fund(account_id: str, amount: Decimal):
-        account = AccountService.get_account_by_id(account_id).model_dump()
-        if not account:
-            raise HTTPException(status_code=404, detail="Account not found")
-        old_balance = Decimal(str(account.get("balance", 0.0)))
-        new_balance = old_balance + amount
+    account_data = AccountService.get_account_by_id(account_id)
+    if not account_data:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    account = account_data.model_dump()
+    old_balance = Decimal(str(account.get("balance", 0.0)))
+    new_balance = old_balance + amount
 
-        account = accounts_collection.find_one_and_update(
-            {"_id": ObjectId(account_id)},
-            {"$set": {"balance": float(new_balance), "updated_at": datetime.now()}},
-        )
-        transaction = AccountService.record_transaction(
-            account_id, amount, TransactionType.credit
-        )
-        return transaction_serializer(transaction)
+    accounts_collection.find_one_and_update(
+        {"_id": ObjectId(account_id)},
+        {"$set": {"balance": float(new_balance), "updated_at": datetime.now()}})
+
+    transaction = AccountService.record_transaction(
+        account_id, amount, TransactionType.credit)
+    return transaction_serializer(transaction)
+
 
     @staticmethod
     def withdraw_fund(account_id: str, amount: Decimal):
-        account = AccountService.get_account_by_id(account_id).model_dump()
-        if not account:
-            raise HTTPException(status_code=404, detail="Account not found")
-        old_balance = Decimal(str(account.get("balance", 0.0)))
-        if old_balance < amount:
-            raise HTTPException(status_code= 400,detials= "insufficient balance")
-        new_balance = old_balance - amount
+    account_data = AccountService.get_account_by_id(account_id)
+    if not account_data:
+        raise HTTPException(status_code=404, detail="Account not found")
 
-        account = accounts_collection.find_one_and_update(
-            {"_id": ObjectId(account_id)},
-            {"$set": {"balance": float(new_balance), "updated_at": datetime.now()}},
-        )
-        transaction = AccountService.record_transaction(
-            account_id, amount, TransactionType.debit
-        )
-        return transaction_serializer(transaction)
+    account = account_data.model_dump()
+    old_balance = Decimal(str(account.get("balance", 0.0)))
+    if old_balance < amount:
+        raise HTTPException(status_code=400, detail="Insufficient balance")
+
+    new_balance = old_balance - amount
+
+    accounts_collection.find_one_and_update(
+        {"_id": ObjectId(account_id)},
+        {"$set": {"balance": float(new_balance), "updated_at": datetime.now()}})
+
+    transaction = AccountService.record_transaction(
+        account_id, amount, TransactionType.debit)
+    return transaction_serializer(transaction)
+
 
 
 
