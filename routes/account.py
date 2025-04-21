@@ -27,20 +27,9 @@ def get_account(current_user=Depends(get_current_user)):
 
 
 @account_router.post("/{account_id}/deposit")
-def deposit_fund(
-    account_id: str, payload: TransactionPayload, current_user=Depends(get_current_user)
-):
+def deposit_fund(account_id: str, payload: TransactionPayload, current_user=Depends(get_current_user)):
     return account_service.deposit_fund(account_id, payload.amount)
 
-
 @account_router.post("/{account_id}/withdraw")
-@limiter.limit("2/minute")
-def withdraw_fund(
-    account_id: str,
-    payload: TransactionPayload,
-    request: Request,
-    current_user=Depends(get_current_user),
-):
-    return account_service.withdraw_fund(
-        account_id, payload.amount, owner_id=current_user.id
-    )
+def withdraw_fund(account_id: str, payload: TransactionPayload, current_user=Depends(get_current_user)):
+    return account_service.deposit_fund(account_id, payload.amount)

@@ -6,7 +6,11 @@ load_dotenv()
 
 
 client = mongo_client.MongoClient(os.environ.get("DB_URL"))
+db = client["user_money"] 
+print("✅ Connected to MongoDB!")
+
 
 accounts_collection = client["user_money"]["accounts"]
 users_collection = client["user_money"]["users"]
 transactions_collection = client["user_money"]["transactions"]
+
