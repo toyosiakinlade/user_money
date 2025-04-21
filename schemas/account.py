@@ -19,6 +19,7 @@ class AccountCreatePayload(AccountBase):
 
 
 class AccountCreate(AccountBase):
+    account_id:str
     user_id: str
     balance: Decimal = condecimal(ge=0, decimal_places=2)
     created_at: datetime = datetime.now()
@@ -26,6 +27,7 @@ class AccountCreate(AccountBase):
 
 
 class Account(AccountBase):
+    account_id:str
     user_id: str
     balance: Decimal
     created_at: datetime
